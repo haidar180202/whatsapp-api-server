@@ -1,0 +1,64 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "WhatsApp API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/chatrooms/{chatroomId}/messages": {
+            "post": {
+                "tags": [
+                    "Chatroom"
+                ],
+                "summary": "Send a message to a chatroom",
+                "operationId": "d4cf2a113618bcdadbbda827d1a472f4",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "description": "ID of the chatroom",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer"
+                                    },
+                                    "message": {
+                                        "type": "string"
+                                    },
+                                    "attachment": {
+                                        "type": "file"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Message sent successfully"
+                    },
+                    "404": {
+                        "description": "Chatroom not found"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Chatroom",
+            "description": "Chatroom"
+        }
+    ]
+}

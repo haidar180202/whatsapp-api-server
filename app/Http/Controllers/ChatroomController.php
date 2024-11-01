@@ -1,8 +1,12 @@
 <?php
 
 // app/Http/Controllers/ChatroomController.php
+
 namespace App\Http\Controllers;
 
+/**
+ * @OA\Info(title="WhatsApp API", version="1.0.0")
+ */
 use Illuminate\Http\Request;
 use App\Models\Chatroom;
 use Illuminate\Support\Facades\Validator;
@@ -10,6 +14,37 @@ use App\Events\MessageSent;
 
 class ChatroomController extends Controller
 {
+    /**
+ * @OA\Post(
+ *     path="/chatrooms/{chatroomId}/messages",
+ *     tags={"Chatroom"},
+ *     summary="Send a message to a chatroom",
+ *     @OA\Parameter(
+ *         name="chatroomId",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the chatroom",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="user_id", type="integer"),
+ *             @OA\Property(property="message", type="string"),
+ *             @OA\Property(property="attachment", type="file")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="Message sent successfully"
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Chatroom not found"
+ *     )
+ * )
+ */
+
 
     public function createChatroom(Request $request)
     {
