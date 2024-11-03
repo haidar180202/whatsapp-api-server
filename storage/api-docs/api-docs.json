@@ -5,13 +5,274 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/chatrooms/{chatroomId}/messages": {
+        "/api/chatrooms": {
+            "get": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "List all chatrooms",
+                "description": "Fetches a list of all chatrooms",
+                "operationId": "ee4a9288947f684deb8e357e0e1eb56b",
+                "responses": {
+                    "200": {
+                        "description": "List of chatrooms retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "General Chatroom"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "A place for general discussion"
+                                                    },
+                                                    "max_members": {
+                                                        "type": "integer",
+                                                        "example": 50
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2024-11-01T10:00:00Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "tags": [
-                    "Chatroom"
+                    "Chatrooms"
+                ],
+                "summary": "Create a new chatroom",
+                "description": "Creates a new chatroom with a given name and optional description",
+                "operationId": "977e7e2bdc5de0f9e9c3f48ab33b37da",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "General Chatroom"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "A place for general discussion"
+                                    },
+                                    "max_members": {
+                                        "type": "integer",
+                                        "example": 50
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Chatroom created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Chatroom created successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "General Chatroom"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "A place for general discussion"
+                                                },
+                                                "max_members": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-11-01T10:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/chatrooms/{chatroomId}/enter": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Enter a chatroom",
+                "description": "Allows a user to enter a chatroom",
+                "operationId": "3afdd70b08bf23d2a542081087fe2e1d",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "description": "ID of the chatroom",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Entered the chatroom successfully"
+                    },
+                    "404": {
+                        "description": "Chatroom not found"
+                    }
+                }
+            }
+        },
+        "/api/chatrooms/{chatroomId}/leave": {
+            "post": {
+                "tags": [
+                    "Chatrooms"
+                ],
+                "summary": "Leave a chatroom",
+                "description": "Allows a user to leave a chatroom",
+                "operationId": "232c4eafbe35ab93173d6057ef025ea6",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "description": "ID of the chatroom",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Left the chatroom successfully"
+                    },
+                    "404": {
+                        "description": "Chatroom not found"
+                    }
+                }
+            }
+        },
+        "/api/chatrooms/{chatroomId}/messages": {
+            "get": {
+                "tags": [
+                    "Messages"
+                ],
+                "summary": "List all messages in a chatroom",
+                "description": "Fetches all messages from a specific chatroom",
+                "operationId": "447aa0ecb120b32a725c8e6c4257ea38",
+                "parameters": [
+                    {
+                        "name": "chatroomId",
+                        "in": "path",
+                        "description": "ID of the chatroom",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Messages retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "message": {
+                                                        "type": "string",
+                                                        "example": "Hello everyone"
+                                                    },
+                                                    "sender_id": {
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2024-11-01T10:10:00Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Messages"
                 ],
                 "summary": "Send a message to a chatroom",
-                "operationId": "d4cf2a113618bcdadbbda827d1a472f4",
+                "description": "Allows a user to send a text or attachment to a chatroom",
+                "operationId": "1a41e4b696ff3540d850114e5e765d24",
                 "parameters": [
                     {
                         "name": "chatroomId",
@@ -29,14 +290,13 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "user_id": {
-                                        "type": "integer"
-                                    },
                                     "message": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Hello everyone"
                                     },
                                     "attachment": {
-                                        "type": "file"
+                                        "type": "string",
+                                        "format": "binary"
                                     }
                                 },
                                 "type": "object"
@@ -48,8 +308,150 @@
                     "201": {
                         "description": "Message sent successfully"
                     },
-                    "404": {
-                        "description": "Chatroom not found"
+                    "400": {
+                        "description": "Invalid input"
+                    }
+                }
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a new user",
+                "description": "Registers a new user account",
+                "operationId": "26417d12e93bce72b8b24a2f31e2f893",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "johndoe"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "token123456"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login user",
+                "description": "Authenticates a user using either username or email and returns a token",
+                "operationId": "b1ddf45286c84b4fd014a2ce3c46b3e8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "username_or_email": {
+                                        "type": "string",
+                                        "example": "johndoe or john.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "token123456"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "john.doe@example.com"
+                                                },
+                                                "username": {
+                                                    "type": "string",
+                                                    "example": "johndoe"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid login details"
+                    },
+                    "422": {
+                        "description": "Validation error"
                     }
                 }
             }
@@ -57,8 +459,16 @@
     },
     "tags": [
         {
-            "name": "Chatroom",
-            "description": "Chatroom"
+            "name": "Chatrooms",
+            "description": "Chatrooms"
+        },
+        {
+            "name": "Messages",
+            "description": "Messages"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentication"
         }
     ]
 }
