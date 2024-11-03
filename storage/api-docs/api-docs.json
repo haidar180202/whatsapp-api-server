@@ -164,12 +164,31 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Entered the chatroom successfully"
                     },
                     "404": {
                         "description": "Chatroom not found"
+                    },
+                    "400": {
+                        "description": "Chatroom is full or User is already in the chatroom"
                     }
                 }
             }
@@ -193,6 +212,22 @@
                         }
                     }
                 ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Left the chatroom successfully"
@@ -268,16 +303,15 @@
             },
             "post": {
                 "tags": [
-                    "Messages"
+                    "Chat"
                 ],
                 "summary": "Send a message to a chatroom",
-                "description": "Allows a user to send a text or attachment to a chatroom",
                 "operationId": "1a41e4b696ff3540d850114e5e765d24",
                 "parameters": [
                     {
                         "name": "chatroomId",
                         "in": "path",
-                        "description": "ID of the chatroom",
+                        "description": "Chatroom ID",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -290,13 +324,13 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
                                     "message": {
                                         "type": "string",
-                                        "example": "Hello everyone"
-                                    },
-                                    "attachment": {
-                                        "type": "string",
-                                        "format": "binary"
+                                        "example": "Hello everyone!"
                                     }
                                 },
                                 "type": "object"
@@ -305,11 +339,54 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "Message sent successfully"
+                    "200": {
+                        "description": "Message sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Message sent successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "chatroom_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Hello everyone!"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-11-01T10:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
-                    "400": {
-                        "description": "Invalid input"
+                    "404": {
+                        "description": "Chatroom not found"
                     }
                 }
             }
@@ -461,6 +538,10 @@
         {
             "name": "Chatrooms",
             "description": "Chatrooms"
+        },
+        {
+            "name": "Chat",
+            "description": "Chat"
         },
         {
             "name": "Messages",

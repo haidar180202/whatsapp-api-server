@@ -9,13 +9,14 @@ namespace App\Http\Controllers;
  */
 use Illuminate\Http\Request;
 use App\Models\Chatroom;
+use App\Models\Message;
 use Illuminate\Support\Facades\Validator;
 use App\Events\MessageSent;
 
 class ChatroomController extends Controller
 {
 
-     /**
+    /**
      * @OA\Post(
      *     path="/api/chatrooms",
      *     summary="Create a new chatroom",
@@ -51,7 +52,6 @@ class ChatroomController extends Controller
      * )
      */
 
-
     public function createChatroom(Request $request)
     {
         // Validasi data input
@@ -73,8 +73,7 @@ class ChatroomController extends Controller
         return response()->json(['message' => 'Chatroom created successfully', 'chatroom' => $chatroom], 201);
     }
 
-
-    /**
+     /**
      * @OA\Get(
      *     path="/api/chatrooms",
      *     summary="List all chatrooms",
@@ -98,7 +97,7 @@ class ChatroomController extends Controller
      *     )
      * )
      */
-
+    
     public function listChatrooms()
     {
         $chatrooms = Chatroom::all();
@@ -119,6 +118,12 @@ class ChatroomController extends Controller
      *         description="ID of the chatroom",
      *         @OA\Schema(type="integer")
      *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="user_id", type="integer", example=1)
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Entered the chatroom successfully"
@@ -126,6 +131,10 @@ class ChatroomController extends Controller
      *     @OA\Response(
      *         response=404,
      *         description="Chatroom not found"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Chatroom is full or User is already in the chatroom"
      *     )
      * )
      */
@@ -164,6 +173,7 @@ class ChatroomController extends Controller
      
 
     // Anotasi dan metode untuk `leaveChatroom`
+    
     /**
      * @OA\Post(
      *     path="/api/chatrooms/{chatroomId}/leave",
@@ -176,6 +186,12 @@ class ChatroomController extends Controller
      *         required=true,
      *         description="ID of the chatroom",
      *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="user_id", type="integer", example=1)
+     *         )
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -207,37 +223,48 @@ class ChatroomController extends Controller
         return response()->json(['message' => 'User left the chatroom successfully'], 200);
     }
     
-        // Anotasi dan metode untuk `sendMessage`
+    // Anotasi dan metode untuk `sendMessage`
     /**
      * @OA\Post(
      *     path="/api/chatrooms/{chatroomId}/messages",
      *     summary="Send a message to a chatroom",
-     *     description="Allows a user to send a text or attachment to a chatroom",
-     *     tags={"Messages"},
+     *     tags={"Chat"},
      *     @OA\Parameter(
      *         name="chatroomId",
      *         in="path",
      *         required=true,
-     *         description="ID of the chatroom",
+     *         description="Chatroom ID",
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Hello everyone"),
-     *             @OA\Property(property="attachment", type="string", format="binary")
+     *             @OA\Property(property="user_id", type="integer", example=1),
+     *             @OA\Property(property="message", type="string", example="Hello everyone!")
      *         )
      *     ),
      *     @OA\Response(
-     *         response=201,
-     *         description="Message sent successfully"
+     *         response=200,
+     *         description="Message sent successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Message sent successfully"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="chatroom_id", type="integer", example=1),
+     *                 @OA\Property(property="user_id", type="integer", example=1),
+     *                 @OA\Property(property="message", type="string", example="Hello everyone!"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2024-11-01T10:00:00Z")
+     *             )
+     *         )
      *     ),
      *     @OA\Response(
-     *         response=400,
-     *         description="Invalid input"
+     *         response=404,
+     *         description="Chatroom not found"
      *     )
      * )
-     */
+    */
+
     
     // public function sendMessage(Request $request, $chatroomId)
     // {
@@ -270,13 +297,78 @@ class ChatroomController extends Controller
     //     return response()->json(['message' => 'Message sent successfully'], 201);
     // }
 
+    // public function sendMessage(Request $request, $chatroomId)
+    // {
+    //     // Validasi input
+    //     $request->validate([
+    //         'user_id' => 'required|exists:users,id',
+    //         'message' => 'nullable|string',
+    //         'attachment' => 'nullable|file',
+    //     ]);
+
+    //     // Temukan chatroom berdasarkan ID
+    //     $chatroom = Chatroom::find($chatroomId);
+    //     if (!$chatroom) {
+    //         return response()->json(['error' => 'Chatroom not found'], 404);
+    //     }
+
+    //     // Simpan file lampiran jika ada
+    //     $attachmentPath = null;
+    //     if ($request->hasFile('attachment')) {
+    //         $attachmentPath = $request->file('attachment')->store('attachments', 'public');
+    //     }
+
+    //     // Simpan pesan ke database
+    //     $message = new Message();
+    //     $message->chatroom_id = $chatroom->id;
+    //     $message->user_id = $request->user_id;
+    //     $message->message = $request->message;
+    //     $message->attachment_path = $attachmentPath;
+    //     $message->save();
+
+    //     // Trigger event untuk broadcast pesan
+    //     event(new MessageSent($message));
+
+    //     return response()->json(['message' => 'Message sent successfully', 'data' => $message], 201);
+    // }
+
+    // public function sendMessage(Request $request, $chatroomId)
+    // {
+    //     $request->validate([
+    //         'user_id' => 'required|exists:users,id',
+    //         'message' => 'nullable|string',
+    //         'attachment' => 'nullable|image',
+    //     ]);
+
+    //     $chatroom = Chatroom::find($chatroomId);
+    //     if (!$chatroom) {
+    //         return response()->json(['error' => 'Chatroom not found'], 404);
+    //     }
+
+    //     $attachmentPath = null;
+    //     if ($request->hasFile('attachment')) {
+    //         $path = $request->file('attachment')->store('picture', 'public');
+    //         $attachmentPath = $path;
+    //     }
+
+    //     $message = Message::create([
+    //         'chatroom_id' => $chatroomId,
+    //         'user_id' => $request->user_id,
+    //         'content' => $request->message,
+    //         'attachment' => $attachmentPath,
+    //     ]);
+
+    //     event(new MessageSent($message));
+    //     return response()->json(['message' => 'Message sent', 'data' => $message], 201);
+    // }
+
     public function sendMessage(Request $request, $chatroomId)
     {
         // Validasi input
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'message' => 'nullable|string',
-            'attachment' => 'nullable|file',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,mp4|max:20480', // Tambahkan validasi untuk jenis file
         ]);
 
         // Temukan chatroom berdasarkan ID
@@ -286,24 +378,26 @@ class ChatroomController extends Controller
         }
 
         // Simpan file lampiran jika ada
-        $attachmentPath = null;
+        $attachmentPath = '';
         if ($request->hasFile('attachment')) {
+            // Simpan lampiran di direktori yang sesuai
             $attachmentPath = $request->file('attachment')->store('attachments', 'public');
         }
 
         // Simpan pesan ke database
-        $message = new Message();
-        $message->chatroom_id = $chatroom->id;
-        $message->user_id = $request->user_id;
-        $message->message = $request->message;
-        $message->attachment_path = $attachmentPath;
-        $message->save();
+        $message = Message::create([
+            'chatroom_id' => $chatroomId,
+            'user_id' => $request->user_id,
+            'content' => $request->message,
+            'attachment' => $attachmentPath,
+        ]);
 
         // Trigger event untuk broadcast pesan
         event(new MessageSent($message));
 
         return response()->json(['message' => 'Message sent successfully', 'data' => $message], 201);
     }
+
 
     // Anotasi dan metode untuk `listMessages`
     /**
